@@ -395,7 +395,6 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                         
                         st.success(f"Демо-обработка в стиле {st.session_state.option} завершена!")
                         st.balloons()
-                        return
                     
                     progress_bar.progress(80)
                     status_text.text("🔍 Ищем результат...")
