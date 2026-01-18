@@ -261,19 +261,6 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
     
     model_checkpoint = os.path.join(checkpoints_dir, model_name, 'latest_net_G.pth')
     
-    # Показываем информацию для отладки
-    with st.expander("🔍 Информация для отладки"):
-        st.write(f"Родительская директория: {parent_dir}")
-        st.write(f"CycleGAN директория: {cyclegan_dir}")
-        st.write(f"CycleGAN существует: {os.path.exists(cyclegan_dir)}")
-        st.write(f"Путь к модели: {model_checkpoint}")
-        st.write(f"Модель существует: {os.path.exists(model_checkpoint)}")
-        
-        if os.path.exists(cyclegan_dir):
-            st.write("Содержимое Cyclegan:")
-            for item in os.listdir(cyclegan_dir):
-                st.write(f"  - {item}")
-    
     if not os.path.exists(model_checkpoint):
         st.warning(trans.get(
             st.session_state.language,
@@ -285,38 +272,33 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
             try:
                 current_filename = st.session_state.get('current_filename', '')
                 if not current_filename:
-                    st.error("Нет загруженного файла для обработки")
+                    st.error(trans.get(st.session_state.language, "errors.file_found_error"))
                     st.session_state.process_requested = False
                 else:
-                    # Создаем прогресс бар
                     progress_bar = st.progress(0)
                     status_text = st.empty()
                     
-                    status_text.text("🔄 Подготовка к обработке...")
+                    status_text.text(trans.get(st.session_state.language, "progress.zero"))
                     progress_bar.progress(10)
                     
-                    # Проверяем что dataroot содержит файл
                     input_file = os.path.join(dataroot, current_filename)
                     if not os.path.exists(input_file):
-                        st.error(f"Файл не найден в dataroot: {input_file}")
+                        st.error(trans.get(st.session_state.language, "errors.file_found_error")) #
                         st.session_state.process_requested = False
                     
-                    # Используем прямой импорт вместо subprocess
                     try:
-                        # Импортируем нашу функцию
                         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
                         from run_cyclegan_direct import run_test_directly
                         
-                        status_text.text("🚀 Запускаем CycleGAN...")
+                        status_text.text(trans.get(st.session_state.language, "progress.first"))
                         progress_bar.progress(30)
                         
-                        # Запускаем CycleGAN напрямую
                         success, message = run_test_directly(
                             dataroot=dataroot,
                             name=model_name,
                             checkpoints_dir=checkpoints_dir,
                             results_dir=results_dir,
-                            cyclegan_dir=cyclegan_dir,  # ← передаем путь к CycleGAN
+                            cyclegan_dir=cyclegan_dir, 
                             model='test',
                             no_dropout=True,
                             dataset_mode='single',
@@ -331,8 +313,7 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                         progress_bar.progress(70)
                         
                         if success:
-                            status_text.text("✅ CycleGAN выполнен успешно!")
-                            st.success(f"Результаты сохранены в: {message}")
+                            status_text.text(trans.get(st.session_state.language, "progress.second"))
                         else:
                             st.error(f"Ошибка CycleGAN: {message}")
                             # Пробуем fallback
@@ -340,8 +321,7 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                             raise Exception("CycleGAN не сработал, переходим к демо")
                             
                     except (ImportError, Exception) as e:
-                        # Fallback: демо-обработка
-                        st.warning(f"⚠️ CycleGAN недоступен: {str(e)[:100]}...")
+                        st.warning(trans.get(st.session_state.language, "errors.cyclegan_error"))
                         status_text.text("🔄 Используем демо-режим...")
                         
                         original_image = st.session_state.original_image
@@ -397,9 +377,9 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                         st.balloons()
                     
                     progress_bar.progress(80)
-                    status_text.text("🔍 Ищем результат...")
+                    status_text.text(trans.get(st.session_state.language, "progress.third"))
                     
-                    # Ищем результат
+                    
                     base_name = os.path.splitext(current_filename)[0]
                     st.session_state.base_name = base_name
 
@@ -410,7 +390,7 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                     
                     if os.path.exists(fake_path):
                         styled_image = Image.open(fake_path)
-                        status_text.text("✅ Результат найден!")
+                        status_text.text(trans.get(st.session_state.language, "progress.fourth"))
                         progress_bar.progress(90)
                         
                         if hasattr(st.session_state, 'original_image') and st.session_state.original_image:
@@ -424,7 +404,7 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                             st.session_state.styled_image = styled_image_resized
                             
                             progress_bar.progress(100)
-                            status_text.text("🎨 Показываем результат...")
+                            status_text.text(trans.get(st.session_state.language, "progress.fifth"))
                             
                             display_images_and_downloads(
                                 original_image,
@@ -445,23 +425,11 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                         else:
                             st.session_state.process_requested = False
                     else:
-                        st.error(f"❌ Файл результата не найден: {fake_path}")
-                        
-                        # Показываем структуру директорий для отладки
-                        if os.path.exists(results_dir):
-                            with st.expander("Содержимое results directory"):
-                                for root, dirs, files in os.walk(results_dir):
-                                    st.write(f"📁 {root}")
-                                    for file in files[:10]:
-                                        st.write(f"  📄 {file}")
                         
                         st.session_state.process_requested = False
                         
             except Exception as e:
                 st.error(f"{trans.get(st.session_state.language, 'errors.processing_error')}: {str(e)}")
-                import traceback
-                with st.expander("Подробности ошибки"):
-                    st.code(traceback.format_exc())
                 st.session_state.process_requested = False
 # =====Show images =====
 elif st.session_state.original_image is not None and st.session_state.styled_image is not None:
