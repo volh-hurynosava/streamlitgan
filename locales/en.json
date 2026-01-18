@@ -81,6 +81,17 @@
         "model_not_found": "Model {model_name} not found. Please ensure the file exists",
         "test_not_found": "test.py file not found",
         "processing_error": "Error during processing",
-        "painter_text_error": "Can't open info about painter"
-    }
+        "painter_text_error": "Can't open info about painter",
+        "file_found_error": "There is no uploaded file for processing.",
+        "file_dataroot_error": "File not found in dataroot",
+        "cyclegan_error": "⚠️ CycleGAN is unavailable"
+    },
+    "progress":{
+          "zero": "🔄 Preparing for processing...",
+          "first": "🚀 Launching CycleGAN...",
+          "second": "✅ CycleGAN completed successfully!",
+          "third": "🔍 Looking for results...",
+          "fourth": "✅ Result found!",
+          "fifth": "🎨 Showing the result..."
+     }
 }
