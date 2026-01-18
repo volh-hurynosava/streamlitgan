@@ -112,7 +112,7 @@ class TranslationManager:
         return lang_code
     
     def get_language_options(self) -> Dict[str, str]:
-        ""Returns a dictionary of options for a selectbox: display name -> language code"""
+        """Returns a dictionary of options for a selectbox: display name -> language code"""
         return {
             self.get_language_display_name(code): code
             for code in self.available_languages.keys()
