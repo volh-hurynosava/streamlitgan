@@ -316,17 +316,14 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                             status_text.text(trans.get(st.session_state.language, "progress.second"))
                         else:
                             st.error(f"Ошибка CycleGAN: {message}")
-                            # Пробуем fallback
                             st.info("Пробуем демо-режим...")
-                            raise Exception("CycleGAN не сработал, переходим к демо")
+                            raise Exception("CycleGAN doesn't work")
                             
                     except (ImportError, Exception) as e:
                         st.warning(trans.get(st.session_state.language, "errors.cyclegan_error"))
-                        status_text.text("🔄 Используем демо-режим...")
                         
                         original_image = st.session_state.original_image
                         
-                        # Простая стилизация для демонстрации
                         from PIL import ImageEnhance, ImageOps
                         
                         if st.session_state.option == "Monet":
@@ -337,19 +334,16 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                             styled_image = enhancer.enhance(1.1)
                             
                         elif st.session_state.option == "Vangogh":
-                            # Яркие цвета
                             enhancer = ImageEnhance.Color(original_image)
                             styled_image = enhancer.enhance(1.8)
                             enhancer = ImageEnhance.Contrast(styled_image)
                             styled_image = enhancer.enhance(1.3)
                             
                         elif st.session_state.option == "Cezanne":
-                            # Сепия
                             styled_image = ImageOps.grayscale(original_image)
                             styled_image = ImageOps.colorize(styled_image, "#704214", "#C0A080")
                             
                         else:  # Ukiyoe
-                            # Упрощенные цвета
                             enhancer = ImageEnhance.Color(original_image)
                             styled_image = enhancer.enhance(0.5)
                             enhancer = ImageEnhance.Contrast(styled_image)
@@ -361,7 +355,6 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                         status_text.text("✅ Демо-обработка завершена!")
                         progress_bar.progress(100)
                         
-                        # Показываем результат
                         base_name = os.path.splitext(current_filename)[0]
                         st.session_state.base_name = base_name
                         
@@ -372,8 +365,6 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                             st.session_state.option,
                             st.session_state.language
                         )
-                        
-                        st.success(f"Демо-обработка в стиле {st.session_state.option} завершена!")
                         st.balloons()
                     
                     progress_bar.progress(80)
