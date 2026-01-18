@@ -300,7 +300,6 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                     if not os.path.exists(input_file):
                         st.error(f"Файл не найден в dataroot: {input_file}")
                         st.session_state.process_requested = False
-                        return
                     
                     # Используем прямой импорт вместо subprocess
                     try:
