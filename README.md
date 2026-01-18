@@ -1,5 +1,5 @@
 # Streamlitgan
-## Streamlit app for style transfering using GAn models
+## Streamlit app for style transfering using GAN models
 
 ### 🎯 Core Capabilities
 - **Multiple Style Models**: Choose from various pre-trained CycleGAN models
