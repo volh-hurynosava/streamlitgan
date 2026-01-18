@@ -1,7 +1,7 @@
 # Streamlitgan
 ## Streamlit app for style transfering using GAN models
 
-##№ ✨ Live Demo
+### ✨ Live Demo
 Experience the app live:  
 🔗 [https://appgan-fnqllxjrrmpn4cgiqodsfe.streamlit.app/](https://appgan-fnqllxjrrmpn4cgiqodsfe.streamlit.app/)
 
