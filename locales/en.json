@@ -1,0 +1,86 @@
+{
+    "app": {
+        "title": "Artistic Style Transfer",
+        "subtitle": "Transform your photos into artistic masterpieces",
+        "about": {
+            "title": "ℹ️ About this app",
+            "tech": "Technologies",
+            "feat": "Features",
+            "technologies": [
+                "**Backend**: PyTorch, CycleGAN",
+                "**Frontend**: Streamlit", 
+                "**Models**: Pretrained CycleGAN models"
+            ],
+            "features": [
+                "Multiple artistic styles",
+                "Russian and English language support", 
+                "Download options"
+            ]
+        }
+    },
+    "sidebar": {
+        "language": "🌐 Language",
+        "upload": {
+            "title": "📤 Upload Image",
+            "help": "Supported formats: JPG, PNG, WebP",
+            "success": "Image uploaded: {filename}"
+        },
+        "style": {
+            "title": "🎨 Choose Style",
+            "help": "Artistic style to apply"
+        },
+        "painters": {
+            "toggle": "Learn more about painters",
+            "select": "Which painter would you like to read about?"
+        },
+        "process_button": "🎨 Create image",
+        "config_check": "🔧 Check configuration"
+    },
+    "styles": {
+        "Monet": {
+            "name": "Monet",
+            "description": "Impressionist landscapes with light effects",
+            "text": "**Famous Works:** Impression Sunrise, Water Lilies, Japanese bridge\\n\\nClaude Monet was a pivotal French painter and a leading figure in the Impressionist movement. Renowned for his mastery in capturing the transient effects of light and color, Monet's works are characterized by their vibrant hues and loose brushwork. He often painted the same scene multiple times to capture varying light conditions, as seen in his series of water lilies, haystacks, and the Rouen Cathedral. His dedication to plein air painting and his innovative approach significantly influenced the development of modern art, making him one of the most celebrated artists of the 19th and early 20th centuries."
+        },
+        "Ukiyoe": {
+            "name": "Ukiyo-e",
+            "description": "Traditional Japanese woodblock art",
+            "text": "**Famous Works:** The Great Wave, Irises, White and Red Plum Blossoms\\n\\nUkiyo-e, meaning \"pictures of the floating world,\" is a genre of Japanese art that flourished from the 17th to the 19th centuries. These woodblock prints and paintings depict scenes of urban life, including kabuki actors, sumo wrestlers, beautiful courtesans, and landscapes. Artists like Hokusai and Hiroshige became renowned for their work in this style, producing iconic images such as \"The Great Wave off Kanagawa\" and \"The Fifty-three Stations of the Tōkaidō.\" Ukiyo-e art is characterized by its bold lines, vibrant colors, and emphasis on everyday life, capturing both the ephemeral beauty and the dynamic culture of Edo-period Japan. This art form greatly influenced Western artists, contributing to the Japonisme movement in Europe and shaping modern art's development."
+        },
+        "Cezanne": {
+            "name": "Cezanne",
+            "description": "Post-impressionist geometric forms",
+            "text": "**Famous Works:** The Basket of Apples, Mont Sainte-Victoire\\n\\nPaul Cezanne was a groundbreaking French artist whose work laid the foundation for the transition from 19th-century Impressionism to 20th-century Cubism. Known for his distinctive approach to form, color, and composition, Cézanne sought to capture the underlying structure of the natural world. His method of building form with color and his exploration of geometric simplification profoundly influenced the direction of modern art. Cézanne's innovative techniques and visionary approach earned him recognition as a key figure in the development of modern art, inspiring future artists such as Picasso and Matisse."
+        },
+        "Vangogh": {
+            "name": "Van Gogh",
+            "description": "Expressive brushwork and vibrant colors",
+            "text": "**Famous Works:** Starry Night, Sunflowers, The Bedroom\\n\\nVincent van Gogh was a Dutch post-impressionist painter whose work had a profound and lasting impact on the art world despite his short and tumultuous life. Known for his bold, dramatic brush strokes, vibrant colors, and emotional intensity, Van Gogh's paintings convey deep personal expression and a unique perspective on the world around him. Although he struggled with mental illness and lived in relative obscurity during his lifetime, selling only a few paintings, Van Gogh's art gained immense recognition posthumously. His innovative techniques and poignant exploration of human experience have cemented him as one of the most influential and beloved artists in history."
+        }
+    
+    },
+    "styles_section":{
+        "title" : "Read about styles"
+    },
+    "main": {
+        "original": "📷 Your Image",
+        "result": "🎨 Result Image",
+        "processing": "Creating image...",
+        "success": "✅ {style} style applied successfully!",
+        "error": "❌ Processing failed",
+        "example_original": "Example image",
+        "example_result": "Example result"
+    },
+    "buttons": {
+        "download_png": "📥 Styled PNG",
+        "download_jpg": "📥 Styled JPEG",
+        "download_collage": "📥 Download Comparison"
+    },
+    "errors": {
+        "no_image": "Please upload an image first!",
+        "model_not_found": "Model {model_name} not found. Please ensure the file exists",
+        "test_not_found": "test.py file not found",
+        "processing_error": "Error during processing",
+        "painter_text_error": "Can't open info about painter"
+    }
+}

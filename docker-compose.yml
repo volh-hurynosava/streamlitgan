@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  style-transfer:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      # Для сохранения данных между перезапусками
+      - ./checkpoints:/app/checkpoints
+      - ./datasets:/app/datasets
+      - ./results:/app/results
+      # Для разработки (горячая перезагрузка кода)
+      - ./main.py:/app/main.py
+      - ./utils.py:/app/utils.py
+      - ./translation_manager.py:/app/translation_manager.py
+      - ./Cyclegan:/app/Cyclegan
+      - ./painters:/app/painters
+      - ./locales:/app/locales
+      - ./images:/app/images
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - STREAMLIT_SERVER_MAX_UPLOAD_SIZE=500
+    restart: unless-stopped
