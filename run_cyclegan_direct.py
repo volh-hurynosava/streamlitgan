@@ -80,6 +80,7 @@ def run_test_directly(dataroot, name, checkpoints_dir, results_dir, cyclegan_dir
                 self.epoch = 'latest'
                 self.verbose = False
                 self.suffix = ''
+                self.model_suffix = ''
                 self.aspect_ratio = 1.0
                 self.phase = 'test'
                 self.eval = False
