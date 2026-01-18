@@ -248,9 +248,6 @@ with st.expander(trans.get(st.session_state.language, "styles_section.title")):
             else:
                 st.markdown(f"## {localized_name}")
                 st.write(painter_text)
-            
-        
-
 # ===== Image process =====
 if st.session_state.get('process_requested') and st.session_state.get('file_ready'):
     style_to_model = {
@@ -263,6 +260,20 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
     model_name = style_to_model.get(st.session_state.option, "style_monet_pretrained")
     
     model_checkpoint = os.path.join(checkpoints_dir, model_name, 'latest_net_G.pth')
+    
+    # Показываем информацию для отладки
+    with st.expander("🔍 Информация для отладки"):
+        st.write(f"Родительская директория: {parent_dir}")
+        st.write(f"CycleGAN директория: {cyclegan_dir}")
+        st.write(f"CycleGAN существует: {os.path.exists(cyclegan_dir)}")
+        st.write(f"Путь к модели: {model_checkpoint}")
+        st.write(f"Модель существует: {os.path.exists(model_checkpoint)}")
+        
+        if os.path.exists(cyclegan_dir):
+            st.write("Содержимое Cyclegan:")
+            for item in os.listdir(cyclegan_dir):
+                st.write(f"  - {item}")
+    
     if not os.path.exists(model_checkpoint):
         st.warning(trans.get(
             st.session_state.language,
@@ -277,43 +288,132 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                     st.error("Нет загруженного файла для обработки")
                     st.session_state.process_requested = False
                 else:
+                    # Создаем прогресс бар
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
                     
-                    command = [
-                        sys.executable,
-                        script_path,
-                        '--dataroot', dataroot,
-                        '--name', model_name,
-                        '--model', 'test',
-                        '--no_dropout',
-                        '--checkpoints_dir', checkpoints_dir,
-                        '--results_dir', results_dir,
-                        '--dataset_mode', 'single',
-                        '--num_test', '1',
-                        '--load_size', '256',
-                        '--crop_size', '256',
-                        '--preprocess', 'none',
-                        '--max_dataset_size', '1000',
-                        '--no_flip',
-                    ]
+                    status_text.text("🔄 Подготовка к обработке...")
+                    progress_bar.progress(10)
                     
-                    result = subprocess.run(
-                        command,
-                        check=True,
-                        capture_output=True,
-                        text=True,
-                        encoding='utf-8',
-                        cwd=cyclegan_dir
-                    )
-
+                    # Проверяем что dataroot содержит файл
+                    input_file = os.path.join(dataroot, current_filename)
+                    if not os.path.exists(input_file):
+                        st.error(f"Файл не найден в dataroot: {input_file}")
+                        st.session_state.process_requested = False
+                        return
+                    
+                    # Используем прямой импорт вместо subprocess
+                    try:
+                        # Импортируем нашу функцию
+                        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+                        from run_cyclegan_direct import run_test_directly
+                        
+                        status_text.text("🚀 Запускаем CycleGAN...")
+                        progress_bar.progress(30)
+                        
+                        # Запускаем CycleGAN напрямую
+                        success, message = run_test_directly(
+                            dataroot=dataroot,
+                            name=model_name,
+                            checkpoints_dir=checkpoints_dir,
+                            results_dir=results_dir,
+                            cyclegan_dir=cyclegan_dir,  # ← передаем путь к CycleGAN
+                            model='test',
+                            no_dropout=True,
+                            dataset_mode='single',
+                            num_test=1,
+                            load_size=256,
+                            crop_size=256,
+                            preprocess='none',
+                            max_dataset_size=1000,
+                            no_flip=True
+                        )
+                        
+                        progress_bar.progress(70)
+                        
+                        if success:
+                            status_text.text("✅ CycleGAN выполнен успешно!")
+                            st.success(f"Результаты сохранены в: {message}")
+                        else:
+                            st.error(f"Ошибка CycleGAN: {message}")
+                            # Пробуем fallback
+                            st.info("Пробуем демо-режим...")
+                            raise Exception("CycleGAN не сработал, переходим к демо")
+                            
+                    except (ImportError, Exception) as e:
+                        # Fallback: демо-обработка
+                        st.warning(f"⚠️ CycleGAN недоступен: {str(e)[:100]}...")
+                        status_text.text("🔄 Используем демо-режим...")
+                        
+                        original_image = st.session_state.original_image
+                        
+                        # Простая стилизация для демонстрации
+                        from PIL import ImageEnhance, ImageOps
+                        
+                        if st.session_state.option == "Monet":
+                            # Синий оттенок
+                            enhancer = ImageEnhance.Color(original_image)
+                            styled_image = enhancer.enhance(0.7)
+                            enhancer = ImageEnhance.Brightness(styled_image)
+                            styled_image = enhancer.enhance(1.1)
+                            
+                        elif st.session_state.option == "Vangogh":
+                            # Яркие цвета
+                            enhancer = ImageEnhance.Color(original_image)
+                            styled_image = enhancer.enhance(1.8)
+                            enhancer = ImageEnhance.Contrast(styled_image)
+                            styled_image = enhancer.enhance(1.3)
+                            
+                        elif st.session_state.option == "Cezanne":
+                            # Сепия
+                            styled_image = ImageOps.grayscale(original_image)
+                            styled_image = ImageOps.colorize(styled_image, "#704214", "#C0A080")
+                            
+                        else:  # Ukiyoe
+                            # Упрощенные цвета
+                            enhancer = ImageEnhance.Color(original_image)
+                            styled_image = enhancer.enhance(0.5)
+                            enhancer = ImageEnhance.Contrast(styled_image)
+                            styled_image = enhancer.enhance(1.5)
+                        
+                        st.session_state.styled_image = styled_image
+                        st.session_state.process_requested = False
+                        
+                        status_text.text("✅ Демо-обработка завершена!")
+                        progress_bar.progress(100)
+                        
+                        # Показываем результат
+                        base_name = os.path.splitext(current_filename)[0]
+                        st.session_state.base_name = base_name
+                        
+                        display_images_and_downloads(
+                            original_image,
+                            styled_image,
+                            base_name,
+                            st.session_state.option,
+                            st.session_state.language
+                        )
+                        
+                        st.success(f"Демо-обработка в стиле {st.session_state.option} завершена!")
+                        st.balloons()
+                        return
+                    
+                    progress_bar.progress(80)
+                    status_text.text("🔍 Ищем результат...")
+                    
+                    # Ищем результат
                     base_name = os.path.splitext(current_filename)[0]
                     st.session_state.base_name = base_name
 
                     final_dir = os.path.join(results_dir, model_name, 'test_latest', 'images')
                     fake_path = os.path.join(final_dir, f"{base_name}_fake.png")
                     
+                    st.info(f"Ищем файл: {fake_path}")
                     
                     if os.path.exists(fake_path):
                         styled_image = Image.open(fake_path)
+                        status_text.text("✅ Результат найден!")
+                        progress_bar.progress(90)
                         
                         if hasattr(st.session_state, 'original_image') and st.session_state.original_image:
                             original_image = st.session_state.original_image
@@ -324,6 +424,9 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                                 styled_image_resized = styled_image
                             
                             st.session_state.styled_image = styled_image_resized
+                            
+                            progress_bar.progress(100)
+                            status_text.text("🎨 Показываем результат...")
                             
                             display_images_and_downloads(
                                 original_image,
@@ -344,14 +447,24 @@ if st.session_state.get('process_requested') and st.session_state.get('file_read
                         else:
                             st.session_state.process_requested = False
                     else:
+                        st.error(f"❌ Файл результата не найден: {fake_path}")
+                        
+                        # Показываем структуру директорий для отладки
+                        if os.path.exists(results_dir):
+                            with st.expander("Содержимое results directory"):
+                                for root, dirs, files in os.walk(results_dir):
+                                    st.write(f"📁 {root}")
+                                    for file in files[:10]:
+                                        st.write(f"  📄 {file}")
+                        
                         st.session_state.process_requested = False
                         
-            except subprocess.CalledProcessError as e:
-                st.error(trans.get(st.session_state.language, "errors.processing_error"))
             except Exception as e:
                 st.error(f"{trans.get(st.session_state.language, 'errors.processing_error')}: {str(e)}")
+                import traceback
+                with st.expander("Подробности ошибки"):
+                    st.code(traceback.format_exc())
                 st.session_state.process_requested = False
-
 # =====Show images =====
 elif st.session_state.original_image is not None and st.session_state.styled_image is not None:
     display_images_and_downloads(
